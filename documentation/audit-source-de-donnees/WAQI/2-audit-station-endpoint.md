@@ -149,6 +149,8 @@ Ces données sont importantes pour :
 
 Elles doivent être conservées dans le système.
 
+## Première proposition de modélisation
+
 ## Conclusion de l’audit
 
 L’API AQICN fournit des données riches et exploitables pour le projet GoodAir.
@@ -170,6 +172,7 @@ En conséquence, le pipeline ETL devra être conçu de manière robuste, avec :
 Cette approche permettra de garantir une intégration fiable et évolutive des données dans la plateforme Big Data.
 
 <a id="retour-json-feed-5722"></a>
+
 ## Retour JSON de l'appel `https://api.waqi.info/feed/@5722/?token=TOKEN_API`
 
 ```json

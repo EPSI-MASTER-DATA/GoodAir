@@ -176,24 +176,6 @@ Il interroge uniquement les stations validées via l’endpoint :
 feed/@station_id
 ```
 
----
-
-## Modélisation du référentiel station
-
-À partir de cet audit, une table `station` peut être définie avec les champs suivants :
-
-```text
-station_id (uid)
-name
-latitude
-longitude
-country (nullable)
-aqicn_url
-is_active
-created_at
-updated_at
-```
-
 ## Conclusion de l’audit
 
 L’endpoint `search` permet d’identifier les stations associées à une ville, mais présente plusieurs limites :
