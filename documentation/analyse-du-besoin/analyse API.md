@@ -11,7 +11,7 @@ L’objectif est de savoir quelles informations peuvent être récupérées et c
 ```bash
 https://api.openweathermap.org/data/2.5/weather?q=Paris&appid=dd07e5a6415da382783d98973a7cc1af&units=metric
 
-##
+#
 Champs principaux
 name → nom de la ville
 main.temp → température
