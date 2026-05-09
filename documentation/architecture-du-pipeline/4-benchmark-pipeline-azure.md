@@ -272,7 +272,55 @@ Cas d'alerte couverts :
 - **Conformité RGPD** : Azure garantit la résidence des données en région Europe (France Centre disponible), répondant à l'exigence de localisation en France ou dans l'Union Européenne.
 - **Réponse MSPR** : répond aux exigences Bloc 3 de sécurisation des accès et au Bloc 5 de traçabilité et gouvernance des données.
 
-# 9. Benchmark de la data visualisation
+# 9. Benchmark du moteur de recherche élastique
+
+## Contexte
+
+La grille d'évaluation MSPR (TPRE843 — Bloc 3) demande explicitement, dans la compétence "Créer un Data Lake", de préciser le **moteur de recherche élastique de données non structurées ou semi-structurées**. Elle cite Elasticsearch (ES) comme exemple de référence dans une architecture AWS.
+
+Ce composant est la quatrième brique obligatoire du Data Lake, en complément du serveur de données (ADLS Gen2), du catalogue (Purview) et du moteur de requêtes (Synapse SQL).
+
+## Options comparées
+
+| Solution | Avantages | Limites |
+| --- | --- | --- |
+| Azure Cognitive Search | Service managé Azure, indexation native ADLS/Blob, recherche full-text, sémantique et vectorielle, intégration Power BI | Coût à l'usage selon le volume indexé |
+| Elasticsearch (autohébergé) | Standard du marché, très puissant, open source | Charge d'exploitation importante, hors écosystème Azure natif |
+| Elastic Cloud sur Azure | Elasticsearch managé, hébergé sur Azure | Coût élevé, dépendance fournisseur supplémentaire |
+| Azure AI Search (anciennement Cognitive Search) | Même service, renommé 2024, capacités IA enrichies (vecteurs, sémantique) | Idem Azure Cognitive Search |
+
+## Choix retenu : Azure Cognitive Search
+
+**Justification**
+
+- **Adéquation fonctionnelle** : indexe directement les fichiers JSON bruts stockés dans ADLS Gen2 (couche Bronze), permettant la recherche full-text sur les noms de stations, de villes, les polluants et les attributions de sources.
+- **Couverture MSPR** : répond à l'exigence explicite d'un moteur de recherche élastique sur les données non structurées et semi-structurées du Data Lake.
+- **Cohérence Azure** : intégration native avec ADLS Gen2 (indexeur Blob), authentification Entra ID, coût à l'usage sans infrastructure à gérer.
+- **Complémentarité avec Synapse SQL** : les deux moteurs coexistent avec des rôles distincts — Synapse SQL pour les requêtes analytiques structurées sur Silver/Gold, Azure Cognitive Search pour l'exploration et la recherche sur Bronze.
+- **Scalabilité** : montée en charge automatique selon le volume de données indexées.
+
+## Positionnement dans le Data Lake
+
+Azure Cognitive Search intervient sur la **couche Bronze**, en lecture seule depuis ADLS Gen2. Il n'écrit pas de données — il produit un index de recherche.
+
+```text
+ADLS Gen2 — Bronze (JSON bruts)
+        ↓
+Azure Cognitive Search
+(indexeur Blob → index full-text)
+        ↓
+Recherche et exploration des données semi-structurées
+```
+
+## Complémentarité des moteurs de requêtes
+
+| Besoin | Moteur | Couche |
+| --- | --- | --- |
+| Requêtes analytiques SQL structurées | Synapse Serverless SQL | Gold |
+| Exploration full-text, recherche par station ou polluant | Azure Cognitive Search | Bronze |
+| Transformations et agrégations | Azure Databricks | Bronze → Silver → Gold |
+
+# 10. Benchmark de la data visualisation
 
 ## Options comparées
 
@@ -293,17 +341,19 @@ Cas d'alerte couverts :
 
 # Synthèse de l'architecture retenue
 
-| Brique              | Composant Azure retenu                   | Rôle                                      |
-| ------------------- | ---------------------------------------- | ----------------------------------------- |
-| Orchestration       | Azure Data Factory                       | Planification, déclenchement, supervision |
-| Extraction API      | Azure Functions (Python)                 | Appels REST, écriture Bronze              |
-| Data Lake           | ADLS Gen2                                | Stockage Bronze/Silver/Gold               |
-| Transformations     | Azure Databricks + Delta Lake            | Nettoyage, normalisation, agrégation      |
-| Data Warehouse      | Synapse Analytics — Serverless SQL       | Serving analytique, requêtes Power BI     |
-| Qualité des données | Jobs Databricks + contraintes Delta      | Contrôles, quarantaine, KPIs qualité      |
-| Monitoring          | Azure Monitor + Log Analytics            | Supervision transversale, alertes         |
-| Sécurité            | Key Vault + Entra ID + Private endpoints | Secrets, RBAC, réseau                     |
-| Data visualisation  | Power BI                                 | Dashboards, restitution métier            |
+| Brique                          | Composant Azure retenu                   | Rôle                                                  |
+| ------------------------------- | ---------------------------------------- | ----------------------------------------------------- |
+| Orchestration                   | Azure Data Factory                       | Planification, déclenchement, supervision             |
+| Extraction API                  | Azure Functions (Python)                 | Appels REST, écriture Bronze                          |
+| Data Lake                       | ADLS Gen2                                | Stockage Reference/Bronze/Silver/Gold                 |
+| Transformations                 | Azure Databricks + Delta Lake            | Nettoyage, normalisation, agrégation                  |
+| Moteur de requêtes analytiques  | Synapse Analytics — Serverless SQL       | Serving analytique structuré, requêtes Power BI       |
+| Moteur de recherche élastique   | Azure Cognitive Search                   | Recherche full-text sur données Bronze semi-structurées |
+| Catalogue de données            | Microsoft Purview                        | Lignage, classification, gouvernance                  |
+| Qualité des données             | Jobs Databricks + contraintes Delta      | Contrôles, quarantaine, KPIs qualité                  |
+| Monitoring                      | Azure Monitor + Log Analytics            | Supervision transversale, alertes                     |
+| Sécurité                        | Key Vault + Entra ID + Private endpoints | Secrets, RBAC, réseau                                 |
+| Data visualisation              | Power BI                                 | Dashboards, restitution métier                        |
 
 # Risques et points de vigilance
 

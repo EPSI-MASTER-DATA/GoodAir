@@ -44,8 +44,8 @@ Azure Data Lake Storage Gen2
 Azure Databricks + Delta Lake
 (transformations Bronze→Silver→Gold)
           ↓
-Azure Synapse Analytics — Serverless SQL
-(serving Data Warehouse)
+Azure Synapse Analytics — Serverless SQL    ← requêtes analytiques structurées (Gold)
+Azure Cognitive Search                      ← recherche élastique semi-structurée (Bronze)
           ↓
 Power BI
 (dashboards, rapports métier)
@@ -166,6 +166,7 @@ ARM et Bicep sont des langages de templating Azure-only. Ils ne sont pas réutil
 - workspace Azure Synapse Analytics ;
 - Azure Data Factory ;
 - Azure Functions (plan et application) ;
+- Azure Cognitive Search (service et index) ;
 - Azure Key Vault et politiques d'accès ;
 - règles de réseau (Private endpoints, VNet) ;
 - instance Grafana sur Azure Container Apps.
@@ -184,15 +185,16 @@ RESTORE TABLE silver.air_quality TO VERSION AS OF 42;
 
 # 4. Ce qui est conservé d'Azure et pourquoi
 
-| Service Azure conservé       | Justification                                                                          |
-| ---------------------------- | -------------------------------------------------------------------------------------- |
-| ADLS Gen2                    | Lock-in acceptable — valeur élevée, Delta Lake portable si migration nécessaire        |
-| Azure Databricks             | Multi-cloud natif (Azure, AWS, GCP) — lock-in limité                                   |
-| Azure Synapse Serverless SQL | Serving léger, remplaçable par Databricks SQL ou Athena en cas de migration            |
-| Azure Data Factory           | Orchestration managée — remplaçable par Airflow si migration, coût de portage maîtrisé |
-| Azure Functions              | Facilement remplaçable par AWS Lambda ou Cloud Functions — logique Python standard     |
-| Azure Key Vault              | Conservé pour les secrets — remplaçable par HashiCorp Vault si nécessaire              |
-| Microsoft Entra ID           | Conservé pour le RBAC — standard entreprise, remplaçable par Okta ou Keycloak          |
+| Service Azure conservé       | Justification                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------ |
+| ADLS Gen2                    | Lock-in acceptable — valeur élevée, Delta Lake portable si migration nécessaire            |
+| Azure Databricks             | Multi-cloud natif (Azure, AWS, GCP) — lock-in limité                                       |
+| Azure Synapse Serverless SQL | Serving analytique structuré, remplaçable par Databricks SQL ou Athena en cas de migration |
+| Azure Cognitive Search       | Moteur de recherche élastique requis par la grille MSPR — remplaçable par Elasticsearch    |
+| Azure Data Factory           | Orchestration managée — remplaçable par Airflow si migration, coût de portage maîtrisé     |
+| Azure Functions              | Facilement remplaçable par AWS Lambda ou Cloud Functions — logique Python standard         |
+| Azure Key Vault              | Conservé pour les secrets — remplaçable par HashiCorp Vault si nécessaire                  |
+| Microsoft Entra ID           | Conservé pour le RBAC — standard entreprise, remplaçable par Okta ou Keycloak              |
 
 # Synthèse des changements
 

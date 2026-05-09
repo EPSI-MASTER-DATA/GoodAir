@@ -36,6 +36,7 @@ goodair/
 │       ├── functions/
 │       ├── adf/
 │       ├── keyvault/
+│       ├── cognitive-search/
 │       └── monitoring/
 │
 ├── functions/
@@ -123,9 +124,10 @@ Code Terraform pour provisionner l'ensemble de l'infrastructure Azure.
 | `modules/databricks/` | Workspace Databricks, clusters, configuration              |
 | `modules/synapse/`    | Workspace Synapse, Serverless SQL                          |
 | `modules/functions/`  | Plan Azure Functions, application, identity managée        |
-| `modules/adf/`        | Data Factory, linked services                              |
-| `modules/keyvault/`   | Key Vault, politiques d'accès                              |
-| `modules/monitoring/` | Container App Grafana, OpenTelemetry collector             |
+| `modules/adf/`              | Data Factory, linked services                                      |
+| `modules/keyvault/`         | Key Vault, politiques d'accès                                      |
+| `modules/cognitive-search/` | Service Azure Cognitive Search, définition de l'index Bronze       |
+| `modules/monitoring/`       | Container App Grafana, OpenTelemetry collector                     |
 
 ### `functions/`
 
