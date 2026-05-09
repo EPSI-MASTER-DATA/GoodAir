@@ -20,7 +20,9 @@ Ces éléments répondent directement aux attentes du Bloc 3, qui demande notamm
 
 ## Architecture retenue
 
-L’architecture retenue est une architecture open source et locale, composée des éléments suivants :
+L’architecture analysée dans ce document est une architecture open source et locale. Elle a servi de base de référence pour le benchmark initial et pour identifier les composants nécessaires au pipeline.
+
+Suite à cette analyse, l’équipe a décidé d’adopter directement une architecture Azure pour le MVP du projet GoodAir, documentée dans le fichier `4-benchmark-pipeline-azure.md`.
 
 ```text
 APIs AQICN / OpenWeatherMap
@@ -42,7 +44,7 @@ PostgreSQL — Data Warehouse / Gold
 Metabase / Apache Superset
 ```
 
-Cette architecture est retenue comme solution principale pour le MVP du projet GoodAir.
+Cette architecture open source sert de référence comparative. Elle n’est pas retenue comme solution de production.
 
 ## Critères de benchmark
 
@@ -432,40 +434,37 @@ L’architecture retenue présente néanmoins certaines limites :
 
 Ces limites sont acceptables dans le cadre d’un MVP pédagogique.
 
-# 14. Évolution possible
+# 14. Architecture de production retenue
 
-À moyen terme, l’architecture pourra évoluer vers une solution cloud Azure :
+L’équipe a décidé d’adopter directement l’architecture Azure comme solution de production pour le MVP GoodAir, sans passer par la stack open source locale.
+
+La correspondance entre les composants open source analysés et les composants Azure retenus est la suivante :
 
 ```text
-Airflow → Azure Data Factory
-MinIO → Azure Data Lake Storage Gen2
-PostgreSQL ODS → Azure SQL Database
-PostgreSQL DWH → Azure Synapse Analytics
-Metabase/Superset → Power BI
-Secrets .env → Azure Key Vault
+Airflow               → Azure Data Factory
+Scripts Python        → Azure Functions (Python)
+MinIO                 → Azure Data Lake Storage Gen2
+PostgreSQL ODS        → Azure Databricks + Delta Lake (Silver)
+PostgreSQL DWH        → Azure Synapse Analytics Serverless SQL (Gold)
+Metabase / Superset   → Power BI
+Secrets .env          → Azure Key Vault
+Logs Airflow          → Azure Monitor + Log Analytics
 ```
 
-Cette trajectoire permet de présenter l’architecture actuelle comme un MVP robuste, tout en anticipant une industrialisation future.
+Cette décision est documentée et justifiée dans le fichier `4-benchmark-pipeline-azure.md`.
 
 # Conclusion
 
-Le benchmark réalisé met en évidence qu’une architecture de pipeline basée sur des technologies open source déployées en local constitue une réponse pertinente aux exigences du projet GoodAir dans le cadre du MSPR.
+Le benchmark réalisé sur les technologies open source a permis d’identifier les composants nécessaires au pipeline GoodAir et de valider leur périmètre fonctionnel.
 
-Cette approche permet de couvrir l’ensemble des besoins identifiés :
+Cette analyse couvre l’ensemble des besoins identifiés :
 
 - collecte de données via APIs externes ;
 - stockage des données brutes dans un data lake ;
-- mise en place de transformations techniques pour fiabiliser les données ;
-- structuration des données dans un ODS normalisé ;
-- construction d’un data warehouse orienté métier via des transformations analytiques ;
+- transformations techniques pour fiabiliser les données ;
+- structuration dans un ODS normalisé ;
+- construction d’un data warehouse orienté métier ;
 - contrôle de la qualité des données ;
-- restitution via des outils de data visualisation.
+- restitution via un outil de data visualisation.
 
-Elle présente également plusieurs avantages majeurs :
-
-- une bonne maîtrise technique par l’équipe ;
-- un coût limité ;
-- une forte démontrabilité auprès du jury ;
-- une architecture modulaire et évolutive.
-
-Enfin, cette architecture constitue une base solide pour une montée en charge future vers des environnements cloud ou des architectures plus industrialisées, tout en respectant les contraintes de traçabilité, de qualité des données et de conformité attendues dans le cadre du projet.
+Suite à ce benchmark, l’équipe a retenu une architecture Azure pour le MVP, documentée dans le fichier `4-benchmark-pipeline-azure.md`. Ce choix permet de répondre aux mêmes exigences fonctionnelles tout en garantissant une gouvernance, une sécurité et une évolutivité adaptées à un environnement de production.
